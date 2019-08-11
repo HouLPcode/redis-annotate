@@ -38,6 +38,7 @@
  * by the user before to call AlFreeList().
  *
  * On error, NULL is returned. Otherwise the pointer to the new list. */
+// 创建一个不包含任何节点的新链表。 
 list *listCreate(void)
 {
     struct list *list;
@@ -53,6 +54,7 @@ list *listCreate(void)
 }
 
 /* Remove all the elements from the list without destroying the list itself. */
+// 删除所有节点
 void listEmpty(list *list)
 {
     unsigned long len;
@@ -85,6 +87,7 @@ void listRelease(list *list)
  * On error, NULL is returned and no operation is performed (i.e. the
  * list remains unaltered).
  * On success the 'list' pointer you pass to the function is returned. */
+ // 插入头节点
 list *listAddNodeHead(list *list, void *value)
 {
     listNode *node;
@@ -92,7 +95,7 @@ list *listAddNodeHead(list *list, void *value)
     if ((node = zmalloc(sizeof(*node))) == NULL)
         return NULL;
     node->value = value;
-    if (list->len == 0) {
+    if (list->len == 0) {// 空链表处理
         list->head = list->tail = node;
         node->prev = node->next = NULL;
     } else {
@@ -111,6 +114,7 @@ list *listAddNodeHead(list *list, void *value)
  * On error, NULL is returned and no operation is performed (i.e. the
  * list remains unaltered).
  * On success the 'list' pointer you pass to the function is returned. */
+ //  插入尾节点
 list *listAddNodeTail(list *list, void *value)
 {
     listNode *node;
@@ -118,7 +122,7 @@ list *listAddNodeTail(list *list, void *value)
     if ((node = zmalloc(sizeof(*node))) == NULL)
         return NULL;
     node->value = value;
-    if (list->len == 0) {
+    if (list->len == 0) { // 空链表处理
         list->head = list->tail = node;
         node->prev = node->next = NULL;
     } else {
@@ -131,6 +135,7 @@ list *listAddNodeTail(list *list, void *value)
     return list;
 }
 
+// 将value插入old_node之前或之后，after=0表示之前
 list *listInsertNode(list *list, listNode *old_node, void *value, int after) {
     listNode *node;
 
@@ -287,6 +292,7 @@ list *listDup(list *orig)
  * On success the first matching node pointer is returned
  * (search starts from head). If no matching node exists
  * NULL is returned. */
+ // 找到值为key的节点
 listNode *listSearchKey(list *list, void *key)
 {
     listIter iter;
@@ -312,6 +318,8 @@ listNode *listSearchKey(list *list, void *key)
  * and so on. Negative integers are used in order to count
  * from the tail, -1 is the last element, -2 the penultimate
  * and so on. If the index is out of range NULL is returned. */
+ // 返回指定索引位置的节点，从0开始。
+ // 负数表示尾节点，-1表示最后一个节点
 listNode *listIndex(list *list, long index) {
     listNode *n;
 
@@ -327,6 +335,7 @@ listNode *listIndex(list *list, long index) {
 }
 
 /* Rotate the list removing the tail node and inserting it to the head. */
+// 旋转一个节点，尾节点当作头节点
 void listRotate(list *list) {
     listNode *tail = list->tail;
 
