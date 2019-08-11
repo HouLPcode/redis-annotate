@@ -44,6 +44,7 @@
 /* Unused arguments generate annoying warnings... */
 #define DICT_NOTUSED(V) ((void) V)
 
+// 1个键值对节点，可以构成单链表类型，解决键冲突（collision）的问题
 typedef struct dictEntry {
     void *key;
     union {
@@ -52,32 +53,35 @@ typedef struct dictEntry {
         int64_t s64;
         double d;
     } v;
-    struct dictEntry *next;
+    struct dictEntry *next;// 相同key的value节点
 } dictEntry;
 
 typedef struct dictType {
-    uint64_t (*hashFunction)(const void *key);
-    void *(*keyDup)(void *privdata, const void *key);
-    void *(*valDup)(void *privdata, const void *obj);
-    int (*keyCompare)(void *privdata, const void *key1, const void *key2);
-    void (*keyDestructor)(void *privdata, void *key);
-    void (*valDestructor)(void *privdata, void *obj);
+    uint64_t (*hashFunction)(const void *key); //// 计算哈希值
+    void *(*keyDup)(void *privdata, const void *key); // 复制key
+    void *(*valDup)(void *privdata, const void *obj); // 复制val
+    int (*keyCompare)(void *privdata, const void *key1, const void *key2); // 比较key
+    void (*keyDestructor)(void *privdata, void *key); // 销毁key
+    void (*valDestructor)(void *privdata, void *obj); // 销毁val
 } dictType;
 
 /* This is our hash table structure. Every dictionary has two of this as we
  * implement incremental rehashing, for the old to the new table. */
 typedef struct dictht {
-    dictEntry **table;
-    unsigned long size;
-    unsigned long sizemask;
-    unsigned long used;
+    dictEntry **table; // 哈希表数组，2维
+    unsigned long size; // 哈希表总大小
+    unsigned long sizemask; // 哈希表大小掩码，用于计算索引值，等于 size - 1
+    unsigned long used; // 该哈希表已有节点的数量
 } dictht;
 
+// 上层字典的实现结构体
 typedef struct dict {
-    dictType *type;
-    void *privdata;
-    dictht ht[2];
-    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+	// type 属性和 privdata 属性是针对不同类型的键值对， 为创建多态字典而设置
+	dictType *type; 
+    void *privdata; // 传给type中函数的可选参数
+    
+    dictht ht[2]; // 哈希表，两个，用来实现rehash
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */ //rehash进度
     unsigned long iterators; /* number of iterators currently running */
 } dict;
 
@@ -85,11 +89,13 @@ typedef struct dict {
  * dictAdd, dictFind, and other functions against the dictionary even while
  * iterating. Otherwise it is a non safe iterator, and only dictNext()
  * should be called while iterating. */
+// safe=1安全的迭代器。迭代过程中使用dictAdd, dictFind等方法；
+// 否则只能使用dictNext遍历方法
 typedef struct dictIterator {
-    dict *d;
-    long index;
-    int table, safe;
-    dictEntry *entry, *nextEntry;
+    dict *d; // 要处理的字典
+    long index; //  
+    int table, safe; // table是0或者1，表示用哪个数组，safe表示是否安全
+    dictEntry *entry, *nextEntry; //分别指向当前的元素和下一个元素
     /* unsafe iterator fingerprint for misuse detection. */
     long long fingerprint;
 } dictIterator;

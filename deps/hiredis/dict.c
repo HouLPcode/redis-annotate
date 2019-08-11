@@ -324,7 +324,8 @@ static int _dictKeyIndex(dict *ht, const void *key) {
     /* Expand the hashtable if needed */
     if (_dictExpandIfNeeded(ht) == DICT_ERR)
         return -1;
-    /* Compute the key hash value */
+    /* Compute the key hash value */ 
+	//计算hash值
     h = dictHashKey(ht, key) & ht->sizemask;
     /* Search if this slot does not already contain the given key */
     he = ht->table[h];

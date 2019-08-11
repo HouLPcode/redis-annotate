@@ -103,6 +103,7 @@ typedef struct dictIterator {
         (ht)->type->keyCompare((ht)->privdata, key1, key2) : \
         (key1) == (key2))
 
+// 计算key的hash值
 #define dictHashKey(ht, key) (ht)->type->hashFunction(key)
 
 #define dictGetEntryKey(he) ((he)->key)
