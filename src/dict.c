@@ -108,6 +108,7 @@ static void _dictReset(dictht *ht)
 }
 
 /* Create a new hash table */
+// 创建字典，type指定hash计算等函数，privDataPtr为参数，大小为0，不包含任何元素
 dict *dictCreate(dictType *type,
         void *privDataPtr)
 {
@@ -218,6 +219,7 @@ int dictRehash(dict *d, int n) {
     }
 
     /* Check if we already rehashed the whole table... */
+	// 全部rehash完，把1赋值0，删除1
     if (d->ht[0].used == 0) {
         zfree(d->ht[0].table);
         d->ht[0] = d->ht[1];
@@ -238,6 +240,7 @@ long long timeInMilliseconds(void) {
 }
 
 /* Rehash for an amount of time between ms milliseconds and ms+1 milliseconds */
+// 执行一段时间的rehash操作，每次执行100个数据的转移，执行ms毫秒
 int dictRehashMilliseconds(dict *d, int ms) {
     long long start = timeInMilliseconds();
     int rehashes = 0;
@@ -262,6 +265,7 @@ static void _dictRehashStep(dict *d) {
 }
 
 /* Add an element to the target hash table */
+// 添加一个元素
 int dictAdd(dict *d, void *key, void *val)
 {
     dictEntry *entry = dictAddRaw(d,key,NULL);
@@ -299,7 +303,7 @@ dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing)
 
     /* Get the index of the new element, or -1 if
      * the element already exists. */
-    if ((index = _dictKeyIndex(d, key, dictHashKey(d,key), existing)) == -1)
+    if ((index = _dictKe·yIndex(d, key, dictHashKey(d,key), existing)) == -1)
         return NULL;
 
     /* Allocate the memory and store the new entry.
